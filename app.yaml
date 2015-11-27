@@ -7,8 +7,6 @@ threadsafe: yes
 handlers:
 - url: .*
   script: robotapp.app
-- url: /images
-  static_dir: images 
 
 libraries:
 - name: webapp2
