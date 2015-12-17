@@ -29,6 +29,13 @@ class AnthonyBotPage(webapp2.RequestHandler):
     def post(self):
         memcache.set(key='d2', value=self.request.get('value'))
 
+class RegisterRobotPage(webapp2.RequestHandler):
+    def get(self):
+        name = memcache.get('name')
+        
+    def post(self):
+        name=self.request.get('name')
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/rt', RTPage),
