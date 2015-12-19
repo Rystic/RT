@@ -5,7 +5,7 @@ from google.appengine.ext.webapp.template import render
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-int heartbeat_timeout = 5;
+heartbeat_timeout = 5;
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -29,7 +29,7 @@ class RegisterRobotPage(webapp2.RequestHandler):
 class HeartBeatPage(webapp2.RequestHandler):
     def post(self):
         name = self.request.get('name')
-        memcache.add(key=name, value=0, time=heartbeat_timeout)
+        memcache.set(key=name, value=0, time=heartbeat_timeout)
                      
 class RobotEntity(ndb.Model):
     name = ndb.StringProperty()
