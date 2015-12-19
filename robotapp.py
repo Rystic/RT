@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 heartbeat_timeout = 5;
+name_string = 'name'
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -15,12 +16,13 @@ class MainPage(webapp2.RequestHandler):
 class RegisterRobotPage(webapp2.RequestHandler):
     def get(self):
         self.response.out.write("""<html><body><p>""")
-        self.response.out.write(getActiveRobots())
+        self.response.out.write(getActiveRobotNames())
+        self.response.out.write(getActiveRobotKeys())
         self.response.out.write("""</p></body></html>""")
         
     def post(self):
-        active_robots = getActiveRobots()
-        name = self.request.get('name')
+        active_robots = getActiveRobotNames()
+        name = self.request.get(name_string)
         if active_robots.count(name) == 0:
             robot = RobotEntity()
             robot.name = name
@@ -28,17 +30,33 @@ class RegisterRobotPage(webapp2.RequestHandler):
 
 class HeartBeatPage(webapp2.RequestHandler):
     def post(self):
-        name = self.request.get('name')
+        name = self.request.get(name_string)
         memcache.set(key=name, value=0, time=heartbeat_timeout)
+
+class PollActiveRobotsPage(webapp2.RequestHandler):
+    def post(self):
+        active_robots = getActiveRobotKeys()
+        for key in active_robots:
+            if memcache.get(key.get().name) is None:
+                print 'unregister'
                      
 class RobotEntity(ndb.Model):
     name = ndb.StringProperty()
 
-def getActiveRobots():
+def getActiveRobotNames():
+    return getActiveRobots(False)
+
+def getActiveRobotKeys():
+    return getActiveRobots(True)
+
+def getActiveRobots(returnKeys):
     active_robots = [];
     qry = RobotEntity.query()
-    for key in qry.iter(keys_only=True):
-        active_robots.append(key.get().name)
+    for item in qry.iter(keys_only=returnKeys):
+        if returnKeys:
+            active_robots.append(item)
+        else:
+            active_robots.append(item.name)
     return active_robots
     
 
@@ -46,4 +64,5 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/register', RegisterRobotPage),
     ('/heartbeat', HeartBeatPage),
+    ('/pollactiverobots', PollActiveRobotsPage),
 ], debug=True)
