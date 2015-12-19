@@ -5,6 +5,8 @@ from google.appengine.ext.webapp.template import render
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
+int heartbeat_timeout = 5;
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
         tmpl = os.path.join(os.path.dirname(__file__), 'index.html')
@@ -24,6 +26,11 @@ class RegisterRobotPage(webapp2.RequestHandler):
             robot.name = name
             robot_key = robot.put()
 
+class HeartBeatPage(webapp2.RequestHandler):
+    def post(self):
+        name = self.request.get('name')
+        memcache.add(key=name, value=0, time=heartbeat_timeout)
+                     
 class RobotEntity(ndb.Model):
     name = ndb.StringProperty()
 
@@ -38,4 +45,5 @@ def getActiveRobots():
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/register', RegisterRobotPage),
+    ('/heartbeat', HeartBeatPage),
 ], debug=True)
