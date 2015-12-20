@@ -8,18 +8,14 @@ from google.appengine.ext import ndb
 heartbeat_timeout = 5;
 name_string = 'name'
 
+# -- Pages --
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
         tmpl = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.write(render(tmpl, {'value' : memcache.get('d1')}))
 
 class RegisterRobotPage(webapp2.RequestHandler):
-    def get(self):
-        self.response.out.write("""<html><body><p>""")
-        self.response.out.write(getActiveRobotNames())
-        self.response.out.write(getActiveRobotKeys())
-        self.response.out.write("""</p></body></html>""")
-        
     def post(self):
         active_robots = getActiveRobotNames()
         name = self.request.get(name_string)
@@ -28,17 +24,19 @@ class RegisterRobotPage(webapp2.RequestHandler):
             robot.name = name
             robot_key = robot.put()
 
-class HeartBeatPage(webapp2.RequestHandler):
-    def post(self):
-        name = self.request.get(name_string)
-        memcache.set(key=name, value=0, time=heartbeat_timeout)
-
 class PollActiveRobotsPage(webapp2.RequestHandler):
     def post(self):
         active_robots = getActiveRobotKeys()
         for key in active_robots:
             if memcache.get(key.get().name) is None:
                 key.delete()
+
+class HeartBeatPage(webapp2.RequestHandler):
+    def post(self):
+        name = self.request.get(name_string)
+        memcache.set(key=name, value=0, time=heartbeat_timeout)
+
+# -- Non-pages --
                      
 class RobotEntity(ndb.Model):
     name = ndb.StringProperty()
@@ -63,6 +61,6 @@ def getActiveRobots(returnKeys):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/register', RegisterRobotPage),
-    ('/heartbeat', HeartBeatPage),
     ('/pollactiverobots', PollActiveRobotsPage),
+    ('/heartbeat', HeartBeatPage),
 ], debug=True)
