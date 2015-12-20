@@ -14,7 +14,7 @@ print 'Name:', str(name)
 
 registered = 0
 
-if 1:
+while 1:
     try:
         if not registered:
             requests.post("http://robotapp-1041.appspot.com/register", data={'name' : name})

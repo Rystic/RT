@@ -38,7 +38,7 @@ class PollActiveRobotsPage(webapp2.RequestHandler):
         active_robots = getActiveRobotKeys()
         for key in active_robots:
             if memcache.get(key.get().name) is None:
-                print 'unregister'
+                key.delete()
                      
 class RobotEntity(ndb.Model):
     name = ndb.StringProperty()

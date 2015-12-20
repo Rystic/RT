@@ -47,6 +47,14 @@
 			   sendKey(event.which, false);
             });
 			
+			setInterval(function() {
+				$.ajax(
+				{
+                    url: "/pollactiverobots",
+                    type: "post",
+                });
+			}, 5000);
+			
 			function sendKey(numCode, pressed)
             {
 			 	$('input[type=text], textarea').val('');
