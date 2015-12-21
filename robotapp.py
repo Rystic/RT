@@ -5,21 +5,21 @@ from google.appengine.ext.webapp.template import render
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-heartbeat_timeout = 5;
 name_string = 'name'
 
 # -- Pages --
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        tmpl = os.path.join(os.path.dirname(__file__), 'index.html')
-        self.response.write(render(tmpl, {'value' : memcache.get('d1')}))
+        tmpl = os.path.join(os.path.dirname(__file__), 'templates/robots.html')
+        self.response.write(render(tmpl, {'active_robots' : getActiveRobotNames()}))
 
 class RegisterRobotPage(webapp2.RequestHandler):
     def post(self):
         active_robots = getActiveRobotNames()
         name = self.request.get(name_string)
         if active_robots.count(name) == 0:
+            setNameInMemcache(name)
             robot = RobotEntity()
             robot.name = name
             robot_key = robot.put()
@@ -27,14 +27,22 @@ class RegisterRobotPage(webapp2.RequestHandler):
 class PollActiveRobotsPage(webapp2.RequestHandler):
     def post(self):
         active_robots = getActiveRobotKeys()
+        self.response.write("""<html><body><p>""")
+        no_robots = True
         for key in active_robots:
             if memcache.get(key.get().name) is None:
                 key.delete()
+            else:
+                no_robots = False
+                self.response.write("""robots!""")
+        if no_robots:
+            self.response.write("""no robots""")
+        self.response.write("""</p></body></html>""")
 
 class HeartBeatPage(webapp2.RequestHandler):
     def post(self):
         name = self.request.get(name_string)
-        memcache.set(key=name, value=0, time=heartbeat_timeout)
+        setNameInMemcache(name)
 
 # -- Non-pages --
                      
@@ -56,6 +64,9 @@ def getActiveRobots(returnKeys):
         else:
             active_robots.append(item.name)
     return active_robots
+
+def setNameInMemcache(name):
+    memcache.set(key=name, value=0, time=5)
     
 
 app = webapp2.WSGIApplication([
