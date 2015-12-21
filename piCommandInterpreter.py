@@ -12,13 +12,13 @@ if len(sys.argv) < 2:
 name = sys.argv[1]
 print 'Name:', str(name)
 
-registered = 0
+registered = False
 
 while 1:
     try:
         if not registered:
             requests.post("http://robotapp-1041.appspot.com/register", data={'name' : name})
-            registered = 1
+            registered = True
             print "registered " + name
         else:
             aResp = urllib.urlopen("http://robotapp-1041.appspot.com/rt");
@@ -28,7 +28,7 @@ while 1:
                 hexInstruction = hex(int(instruction, 2))[2]
                 ser.write(hexInstruction)
             requests.post("http://robotapp-1041.appspot.com/heartbeat", data={'name' : name})
-        time.sleep(.1)
+        time.sleep(.25)
     except IOError:
         time.sleep(10)
-        registered = 0
+        registered = False
