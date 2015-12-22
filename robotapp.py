@@ -29,15 +29,23 @@ class PollActiveRobotsPage(webapp2.RequestHandler):
         active_robots = getActiveRobotKeys()
         self.response.write("""<html><body><p>""")
         no_robots = True
+        tmpl = os.path.join(os.path.dirname(__file__), 'templates/robot_info_block.html')
         for key in active_robots:
-            if memcache.get(key.get().name) is None:
+            name = key.get().name
+            if memcache.get(name) is None:
                 key.delete()
             else:
                 no_robots = False
-                self.response.write("""robots!""")
+                self.response.write(render(tmpl, {'name' : name}))
         if no_robots:
             self.response.write("""no robots""")
         self.response.write("""</p></body></html>""")
+
+class ControlPage(webapp2.RequestHandler):
+    def post(self):
+        name = self.request.get(name_string)
+        tmpl = os.path.join(os.path.dirname(__file__), 'templates/control.html')
+        self.response.write(render(tmpl, {name_string : name}))
 
 class HeartBeatPage(webapp2.RequestHandler):
     def post(self):
@@ -73,5 +81,6 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/register', RegisterRobotPage),
     ('/pollactiverobots', PollActiveRobotsPage),
+    ('/control', ControlPage),
     ('/heartbeat', HeartBeatPage),
 ], debug=True)
