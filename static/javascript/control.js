@@ -12,6 +12,9 @@ keysPressed.set("w", false);
 keysPressed.set("s", false);
 keysPressed.set("a", false);
 keysPressed.set("d", false);
+
+var robot_name = document.getElementById("target").getAttribute("robot_name");
+
 			
 $( "#target" ).keypress(function( event) 
 {
@@ -67,14 +70,11 @@ function sendKey(numCode, pressed)
     	instructionString = '0' + totalKeyValue;
     else if (totalKeyValue >= 1000)
     	instructionString = totalKeyValue;
-    				
     console.log(instructionString)
-    				
-    document.getElementById("dir").innerHTML = instructionString;
     $.ajax(
     {
-        url: "/rt",
+        url: "/instruction",
         type: "post",
-        data:{value:instructionString},
+        data:{value:instructionString, name:robot_name},
     });
 }

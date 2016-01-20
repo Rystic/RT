@@ -5,18 +5,13 @@
 		<script type="text/javascript" src="static/javascript/jquery-1.2.6.min.js"></script>
 	</head>
   	<body>
-        <div id="dir">{{value}}</div>
         <form>
             <fieldset>
-                <label for="target">Drive Car (WASD):</label>
-                <input id="target" type="text">
+                <label for="target">Drive {{name}} (WASD):</label>
+                <input id="target" type="text" robot_name={{name}}>
             </fieldset>
+			<label id="robot_name">{{name}}</label>
         </form>
-		<form>
-		  	<input type="radio" name="robot" id="rt" value="rt" checked>Control RT
-    		<br>
-    	  	<input type="radio" name="robot" id="ab" value="anthonybot">Control Anthonybot
-  		</form>
 		<script src="static/javascript/control.js"></script>
   	</body>
 </html>
