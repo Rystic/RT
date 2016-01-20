@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 name_string = 'name'
+robot_names = ['rt', 'anthonybot']
 
 # -- Pages --
 
@@ -16,25 +17,16 @@ class MainPage(webapp2.RequestHandler):
 
 class RegisterRobotPage(webapp2.RequestHandler):
     def post(self):
-        active_robots = getActiveRobotNames()
         name = self.request.get(name_string)
-        if active_robots.count(name) == 0:
-            setNameInMemcache(name)
-            robot = RobotEntity()
-            robot.name = name
-            robot_key = robot.put()
+        setNameInMemcache(name)
 
 class PollActiveRobotsPage(webapp2.RequestHandler):
     def post(self):
-        active_robots = getActiveRobotKeys()
         self.response.write("""<html><body><p>""")
         no_robots = True
         tmpl = os.path.join(os.path.dirname(__file__), 'templates/robot_info_block.html')
-        for key in active_robots:
-            name = key.get().name
-            if memcache.get(name) is None:
-                key.delete()
-            else:
+        for name in robot_names:
+            if memcache.get(name) is not None:
                 no_robots = False
                 self.response.write(render(tmpl, {'name' : name}))
         if no_robots:
@@ -53,29 +45,16 @@ class HeartBeatPage(webapp2.RequestHandler):
         setNameInMemcache(name)
 
 # -- Non-pages --
-                     
-class RobotEntity(ndb.Model):
-    name = ndb.StringProperty()
-
-def getActiveRobotNames():
-    return getActiveRobots(False)
-
-def getActiveRobotKeys():
-    return getActiveRobots(True)
-
-def getActiveRobots(returnKeys):
-    active_robots = [];
-    qry = RobotEntity.query()
-    for item in qry.iter(keys_only=returnKeys):
-        if returnKeys:
-            active_robots.append(item)
-        else:
-            active_robots.append(item.name)
-    return active_robots
 
 def setNameInMemcache(name):
     memcache.set(key=name, value=0, time=5)
-    
+
+def getActiveRobotNames():
+    active_robots = []
+    for name in robot_names:
+         if memcache.get(name) is not None:
+             active_robots.append(name)
+    return active_robots
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
