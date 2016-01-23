@@ -9,9 +9,11 @@ from google.appengine.ext import ndb
 name_string = 'name'
 robot_names = ['rt', 'anthonybot']
 
-# -- Pages --
+# -- Handlers --
+
 
 class MainPage(webapp2.RequestHandler):
+
     def get(self):
         tmpl = os.path.join(os.path.dirname(__file__), 'templates/robots.html')
         self.response.write(render(tmpl, {'active_robots' : getActiveRobotNames()}))
@@ -21,12 +23,16 @@ class MainPage(webapp2.RequestHandler):
         query_params = {'name': name}
         self.redirect('/control?' + urllib.urlencode(query_params))
 
+
 class RegisterRobotPage(webapp2.RequestHandler):
+
     def post(self):
         name = self.request.get(name_string)
         setNameInMemcache(name)
 
+
 class PollActiveRobotsPage(webapp2.RequestHandler):
+
     def post(self):
         self.response.write("""<html><body><p>""")
         no_robots = True
@@ -39,23 +45,30 @@ class PollActiveRobotsPage(webapp2.RequestHandler):
             self.response.write("""no robots""")
         self.response.write("""</p></body></html>""")
 
+
 class ControlPage(webapp2.RequestHandler):
+
     def get(self):
         name = self.request.get(name_string)
         tmpl = os.path.join(os.path.dirname(__file__), 'templates/control.html')
         self.response.write(render(tmpl, {name_string : name}))
 
+
 class HeartBeatPage(webapp2.RequestHandler):
+
     def post(self):
         name = self.request.get(name_string)
         setNameInMemcache(name)
 
+
 class InstructionPage(webapp2.RequestHandler):
+
     def get(self):
         name = self.request.get(name_string) + "inst"
         self.response.write("""<html><body><p>""")
         self.response.write(memcache.get(name))
         self.response.write("""</p></body></html>""")
+
     def post(self):
         name = self.request.get(name_string) + "inst"
         instructionValue = self.request.get('value')
@@ -72,6 +85,7 @@ def getActiveRobotNames():
          if memcache.get(name) is not None:
              active_robots.append(name)
     return active_robots
+
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
