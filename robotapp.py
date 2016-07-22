@@ -45,14 +45,11 @@ class PollActiveRobotsPage(webapp2.RequestHandler):
             self.response.write("""no robots""")
         self.response.write("""</p></body></html>""")
 
-<<<<<<< HEAD
     def get(self):
         name = self.request.get(name_string)
         if memcache.get(name) is None:
             self.redirect('/')
-=======
->>>>>>> origin/multi-control
-
+            
 class ControlPage(webapp2.RequestHandler):
 
     def get(self):
