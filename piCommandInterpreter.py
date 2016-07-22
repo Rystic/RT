@@ -22,13 +22,12 @@ while 1:
             print "registered " + name
         else:
             aResp = urllib.urlopen("http://robotapp-1041.appspot.com/instruction?name=" + name)
-            print str(aResp.read())
-            #aResp = urllib.urlopen("http://robotapp-1041.appspot.com/instruction");
-            #web_pg = aResp.read();
-            #instruction = web_pg[15:19]
-            #if (instruction != 'None'):
-                #hexInstruction = hex(int(instruction, 2))[2]
-                #ser.write(hexInstruction)
+            web_pg = aResp.read();
+            instruction = web_pg[15:19]
+            print instruction
+            if (instruction != 'None'):
+                hexInstruction = hex(int(instruction, 2))[2]
+                ser.write(hexInstruction)
 
             requests.post("http://robotapp-1041.appspot.com/heartbeat", data={'name' : name})
         time.sleep(.25)

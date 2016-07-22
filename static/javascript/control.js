@@ -14,7 +14,6 @@ keysPressed.set("a", false);
 keysPressed.set("d", false);
 
 var robot_name = document.getElementById("target").getAttribute("robot_name");
-
 			
 $( "#target" ).keypress(function( event) 
 {
@@ -27,14 +26,19 @@ $( "#target" ).keyup(function()
    	//console.log("now releasing " + String.fromCharCode(event.which) + "(" + event.which+")");
 	sendKey(event.which, false);
 });
-			
-setInterval(function() {
-	$.ajax(
+
+function updateMsg()
+{
+ 	console.log("running command");
+  	$.ajax(
 	{
-	 	url: "/pollactiverobots",
-        type: "post",
-    });
-}, 5000);
+	    url: "/pollactiverobots",
+		type: "get",
+		data:{name:robot_name},
+	});
+	setTimeout('updateMsg()', 4000);
+}
+updateMsg();
 			
 function sendKey(numCode, pressed)
 {
