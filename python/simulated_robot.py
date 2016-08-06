@@ -1,13 +1,7 @@
 from readers.wasd_reader import WASDReader
 from writers.simulated_writer import SimulatedWriter
-import time
+import robot_runner
 
-wasdReader = WASDReader("rt")
-simWriter = SimulatedWriter()
-
-while 1:
-    instruction = wasdReader.readInstruction()
-    simWriter.write(instruction)
-    time.sleep(.25)
+robot_runner.execute(WASDReader("rt"), SimulatedWriter())
 
 # generate a random name
