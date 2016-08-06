@@ -16,6 +16,7 @@ registered = False
 
 while 1:
     try:
+        # instruction reader
         if not registered:
             requests.post("http://robotapp-1041.appspot.com/register", data={'name' : name})
             registered = True
@@ -25,6 +26,8 @@ while 1:
             web_pg = aResp.read();
             instruction = web_pg[15:19]
             print instruction
+
+            # instruction writer
             if (instruction != 'None'):
                 hexInstruction = hex(int(instruction, 2))[2]
                 ser.write(hexInstruction)
