@@ -1,5 +1,5 @@
-from wasd_reader import WASDReader
-from simulated_writer import SimulatedWriter
+from readers.wasd_reader import WASDReader
+from writers.simulated_writer import SimulatedWriter
 import time
 
 wasdReader = WASDReader("rt")
